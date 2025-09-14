@@ -1,124 +1,115 @@
 "use client";
 
 import Link from 'next/link';
+import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
 
-// --- Ícones SVG para os botões ---
+// --- Ícones SVG ---
 
-const PanelIcon = ({ className }) => (
+const PortalIcon = ({ className }) => (
     <svg className={className} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h12A2.25 2.25 0 0020.25 14.25V3M3.75 3l-1.48-1.48M3.75 3h16.5M12 3v13.5" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
     </svg>
 );
 
-const MachineIcon = ({ className }) => (
-    <svg className={className} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 4.5l7.5 7.5-7.5 7.5M11.25 4.5l-7.5 7.5 7.5 7.5" />
-    </svg>
-);
+// --- Componente de Card Magnético ---
+
+const MagneticCard = ({ children }) => {
+  const ref = useRef(null);
+  const [position, setPosition] = React.useState({ x: 0, y: 0 });
+
+  const handleMouse = (e) => {
+    const { clientX, clientY } = e;
+    const { height, width, left, top } = ref.current.getBoundingClientRect();
+    const x = clientX - (left + width / 2);
+    const y = clientY - (top + height / 2);
+    setPosition({ x, y });
+  };
+
+  const mouseLeave = () => {
+    setPosition({ x: 0, y: 0 });
+  };
+
+  const { x, y } = position;
+  return (
+    <motion.div
+      ref={ref}
+      onMouseMove={handleMouse}
+      onMouseLeave={mouseLeave}
+      animate={{ x, y }}
+      transition={{ type: "spring", stiffness: 250, damping: 15, mass: 0.5 }}
+      className="relative z-10"
+    >
+      {children}
+    </motion.div>
+  );
+};
+
 
 // --- Componente Principal da Página Inicial ---
 
 export default function HomePage() {
-
-  // Variantes para a animação do container principal
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.3, // Anima os filhos com um atraso de 0.3s entre eles
-        delayChildren: 0.2,
-      },
-    },
-  };
-
-  // Variantes para a animação dos itens filhos
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: "spring",
-        stiffness: 100,
-        damping: 12,
-      },
-    },
-  };
-
   return (
-    // Container com fundo de grade e gradiente radial para um efeito de "palco"
-    <main className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-slate-950 p-8 text-white">
-      <div className="absolute inset-0 h-full w-full bg-slate-950 [background-image:linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
-      <div className="absolute bottom-0 left-[-20%] right-0 top-[-10%] h-[500px] w-[500px] rounded-full bg-[radial-gradient(circle_farthest-side,rgba(255,0,182,.15),rgba(255,255,255,0))]"></div>
-      <div className="absolute bottom-0 right-[-20%] top-[-10%] h-[500px] w-[500px] rounded-full bg-[radial-gradient(circle_farthest-side,rgba(255,0,182,.15),rgba(255,255,255,0))]"></div>
+    <main className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-black p-8 text-white">
+      {/* Efeito de fundo com gradiente sutil */}
+      <div className="absolute left-1/2 top-1/2 h-[32rem] w-[32rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle_farthest-side,rgba(255,255,255,0.08),rgba(255,255,255,0))]"></div>
 
-      {/* Container de animação principal */}
-      <motion.div
-        className="z-10 flex flex-col items-center text-center"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        {/* Título animado */}
-        <motion.h1
-          className="mb-4 text-5xl font-black tracking-tighter sm:text-7xl"
-          variants={itemVariants}
+      <div className="z-10 flex flex-col items-center text-center">
+        {/* Título com animação de entrada */}
+        <motion.h1 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+          className="mb-4 text-6xl font-black tracking-tighter sm:text-8xl bg-clip-text text-transparent bg-gradient-to-b from-white to-gray-500"
         >
-          <span className="bg-gradient-to-b from-white to-gray-400 bg-clip-text text-transparent">
-            Portal de Projetos
-          </span>
+          Bem-vindo.
         </motion.h1>
 
-        {/* Parágrafo animado */}
-        <motion.p
-          className="max-w-xl text-lg text-gray-400"
-          variants={itemVariants}
+        <motion.p 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut", delay: 0.4 }}
+          className="max-w-md text-lg text-gray-400"
         >
-          Navegue pelos experimentos interativos criados com Next.js, React e Framer Motion.
+          Um espaço para explorar experimentos interativos. Selecione um destino para começar sua jornada.
         </motion.p>
-
-        {/* Container para os links/portais, com animação própria */}
-        <motion.div
-          className="mt-12 flex flex-col items-center gap-6 sm:flex-row"
-          variants={itemVariants}
-        >
-          <Link href="/panel" passHref>
+        
+        <div className="mt-12 flex flex-col sm:flex-row gap-8">
+    {/* Card 1 (o que já existia) */}
+     <MagneticCard>
+        <Link href="/dados" passHref>
             <motion.div
-              className="group relative flex cursor-pointer items-center gap-4 rounded-lg border border-white/10 bg-gray-900/50 px-8 py-6 shadow-2xl transition-all duration-300 hover:border-cyan-400/50"
-              whileHover={{ y: -5, scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+                className="group relative flex cursor-pointer items-center gap-4 rounded-full border border-white/10 bg-gray-900/50 px-8 py-5 text-xl font-semibold shadow-2xl transition-all duration-300 hover:border-white/30"
+                whileHover={{ scale: 1.1, boxShadow: "0px 0px 20px rgba(255, 255, 255, 0.2)" }}
             >
-              <div className="absolute -inset-px rounded-lg bg-gradient-to-r from-cyan-500 to-purple-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-              <div className="relative z-10 flex items-center gap-4">
-                  <PanelIcon className="h-8 w-8 text-cyan-300" />
-                  <div>
-                      <h3 className="text-xl font-bold text-white">Painel de Controle</h3>
-                      <p className="text-sm text-gray-400">Dashboard Interativo</p>
-                  </div>
-              </div>
+                <span className="bg-gradient-to-r from-pink-500 to-orange-400 bg-clip-text text-transparent">
+                    Analisar Dados
+                </span>
+                <motion.div initial={{ x: 0 }} whileHover={{ x: 5 }}>
+                    <span className="text-pink-400">→</span>
+                </motion.div>
             </motion.div>
-          </Link>
+        </Link>
+    </MagneticCard>
 
-          <Link href="/panel2" passHref>
+    {/* Card 2 (o novo, com destino e estilo diferentes) */}
+    <MagneticCard>
+        <Link href="/portal" passHref>
             <motion.div
-              className="group relative flex cursor-pointer items-center gap-4 rounded-lg border border-white/10 bg-gray-900/50 px-8 py-6 shadow-2xl transition-all duration-300 hover:border-pink-400/50"
-              whileHover={{ y: -5, scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+                className="group relative flex cursor-pointer items-center gap-4 rounded-full border border-white/10 bg-gray-900/50 px-8 py-5 text-xl font-semibold shadow-2xl transition-all duration-300 hover:border-white/30"
+                whileHover={{ scale: 1.1, boxShadow: "0px 0px 20px rgba(255, 255, 255, 0.2)" }}
             >
-                <div className="absolute -inset-px rounded-lg bg-gradient-to-r from-pink-500 to-purple-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                <div className="relative z-10 flex items-center gap-4">
-                    <MachineIcon className="h-8 w-8 text-pink-300" />
-                    <div>
-                        <h3 className="text-xl font-bold text-white">Reator de Singularidade</h3>
-                        <p className="text-sm text-gray-400">A Máquina Enorme</p>
-                    </div>
-                </div>
+                <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+                    Portal de Projetos
+                </span>
+                <motion.div initial={{ x: 0 }} whileHover={{ x: 5 }}>
+                    <span className="text-cyan-400">→</span>
+                </motion.div>
             </motion.div>
-          </Link>
-        </motion.div>
-      </motion.div>
+        </Link>
+    </MagneticCard>
+    </div>
+      </div>
     </main>
   );
 }
